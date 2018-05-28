@@ -46,11 +46,6 @@ if [[ -x "$HOME/.nodenv/bin/nodenv" ]]; then
   eval "$("$HOME/.nodenv/bin/nodenv" init -)"
 fi
 
-if ! type "apollo-codegen" >/dev/null 2>&1; then
-  echo "Can't find apollo-codegen. Installing..."
-  install_apollo_codegen
-fi
-
 INSTALLED_APOLLO_CODEGEN_VERSION="$(get_installed_version)"
 
 if ! are_versions_compatible $INSTALLED_APOLLO_CODEGEN_VERSION $REQUIRED_APOLLO_CODEGEN_VERSION; then
