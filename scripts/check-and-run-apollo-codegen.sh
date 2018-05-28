@@ -6,26 +6,7 @@ REQUIRED_APOLLO_CODEGEN_VERSION=0.17
 # This script is supposed to be invoked as part of the Xcode build process
 # and relies on environment variables set by Xcode
 
-install_apollo_codegen() {
-  # Exit immediately if the command fails
-  set -e
-  npm install -g apollo-codegen@$REQUIRED_APOLLO_CODEGEN_VERSION
-  set +e
-}
-
 # We consider versions to be compatible if the major and minor versions match
-are_versions_compatible() {
-  [[ "$(cut -d. -f1-2 <<< $1)" == "$(cut -d. -f1-2 <<< $2)" ]]
-}
-
-get_installed_version() {
-  version=$(apollo-codegen --version)
-  if [[ $? -eq 0 ]]; then
-    echo "$version"
-  else
-    echo "an unknown older version"
-  fi
-}
 
 if [[ -z "$CONFIGURATION" ]]; then
     echo "$0 must be invoked as part of an Xcode script phase"
