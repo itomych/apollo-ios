@@ -46,14 +46,6 @@ if [[ -x "$HOME/.nodenv/bin/nodenv" ]]; then
   eval "$("$HOME/.nodenv/bin/nodenv" init -)"
 fi
 
-INSTALLED_APOLLO_CODEGEN_VERSION="$(get_installed_version)"
-
-if ! are_versions_compatible $INSTALLED_APOLLO_CODEGEN_VERSION $REQUIRED_APOLLO_CODEGEN_VERSION; then
-  echo "The version of Apollo.framework in your project requires apollo-codegen $REQUIRED_APOLLO_CODEGEN_VERSION, \
-but $INSTALLED_APOLLO_CODEGEN_VERSION seems to be installed. Installing..."
-  install_apollo_codegen
-fi
-
 # Print commands before executing them (useful for troubleshooting)
 set -x
 
