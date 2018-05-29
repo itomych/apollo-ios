@@ -8,6 +8,8 @@ REQUIRED_APOLLO_CODEGEN_VERSION=0.17
 
 # We consider versions to be compatible if the major and minor versions match
 
+export PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:$PATH
+
 if [[ -z "$CONFIGURATION" ]]; then
     echo "$0 must be invoked as part of an Xcode script phase"
     exit 1
@@ -30,4 +32,7 @@ fi
 # Print commands before executing them (useful for troubleshooting)
 set -x
 
+echo $PATH
+env
+which node
 exec apollo-codegen "$@"
