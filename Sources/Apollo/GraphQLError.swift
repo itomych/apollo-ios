@@ -3,11 +3,19 @@ import Foundation
 /// Represents an error encountered during the execution of a GraphQL operation.
 ///
 ///  - SeeAlso: [The Response Format section in the GraphQL specification](https://facebook.github.io/graphql/#sec-Response-Format)
+
+enum SerializationError: Error {
+    case missing(String)
+    case invalid(String, Any)
+}
+
 public struct GraphQLError: Error {
     
-    private let object: JSONObject
+    public typealias ErrorObject = [String: Any]
     
-    public init(_ object: JSONObject) {
+    private let object: ErrorObject
+    
+    public init(_ object: ErrorObject) {
         self.object = object
     }
     
@@ -17,33 +25,41 @@ public struct GraphQLError: Error {
     
     public init(data: Data?, response: HTTPURLResponse?, error: Error?) {
         
-        var code: Int = response?.statusCode ?? 0
-        var messages: String = response?.statusCodeDescription ?? ""
-        var message: [String] = [response?.statusCodeDescription ?? ""]
-        var details: [String : [Any]] =  ["" : [""]]
-        
         if let body = data {
             do {
                 guard let body = try JSONSerializationFormat.deserialize(data: body) as? JSONObject else {
                     throw GraphQLError(data: nil, response: response, error: error)
                     return
                 }
-                self.init(body)
-                return
-            } catch {
                 
-            }
+                if let errorsArray = body["errors"] as? [ErrorObject], let errorBody = errorsArray.first  {
+                    self.init(errorBody)
+                } else if let jsonResult = body["errors"] as? Dictionary<String, AnyObject> {
+                    self.init(jsonResult)
+                } else {
+                    self.init(body)
+                }
+                return
+            } catch { }
         }
-        let dict: [String: JSONValue] = ["code": code,
-                                         "type": "default",
-                                         "message": message,
-                                         "messages": messages,
-                                         "details": details]
+        
+        var code: Int = response?.statusCode ?? 0
+        var messages: String = response?.statusCodeDescription ?? ""
+        var message: [String] = [response?.statusCodeDescription ?? ""]
+        var details: [String : [Any]] =  ["" : [""]]
+        
+        
+        let dict: ErrorObject = ["code": code,
+                                 "type": "default",
+                                 "message": message,
+                                 "messages": messages,
+                                 "details": details]
         
         self.init(dict)
     }
     
     /// GraphQL servers may provide additional entries as they choose to produce more helpful or machine‐readable errors.
+    
     public subscript(key: String) -> Any? {
         return object[key]
     }
